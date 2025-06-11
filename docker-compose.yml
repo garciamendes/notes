@@ -1,0 +1,15 @@
+services:
+  todo-go:
+    container_name: note-go
+    image: "bitnami/postgresql:15"
+    environment:
+      - POSTGRES_USER=note
+      - POSTGRES_PASSWORD=note
+      - POSTGRES_DB=note
+    ports:
+      - "5432:5432"
+    volumes:
+      - note:/var/lib/postgresql/data
+
+volumes:
+  note:

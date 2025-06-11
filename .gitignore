@@ -1,0 +1,21 @@
+# Binaries
+*.exe
+*.o
+*.out
+
+# IDE
+.idea/
+.vscode/
+
+# Temporary files
+*.tmp
+*.swp
+
+# Build artifacts
+bin/
+pkg/
+
+# Dependency management
+go.sum
+
+.env*
