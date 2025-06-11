@@ -8,7 +8,7 @@ import (
 type User struct {
 	ID       uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Name     *string   `json:"name"`
-	Email    string    `json:"emai" validate:"required,email"`
+	Email    string    `gorm:"unique" json:"email" validate:"required,email"`
 	Password string    `json:"password" validate:"required"`
 
 	Notes []Note `gorm:"foreignKey:UserID"`
