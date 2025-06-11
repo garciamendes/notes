@@ -27,7 +27,8 @@ func main() {
 	router := mux.NewRouter()
 
 	// User
-	router.HandleFunc("/user/register", handlers.User().Register).Methods(http.MethodPost)
+	router.HandleFunc("/user", handlers.User().Register).Methods(http.MethodPost)
+	router.HandleFunc("/user/login", handlers.User().Login).Methods(http.MethodPost)
 
 	http.ListenAndServe(":8080", router)
 }

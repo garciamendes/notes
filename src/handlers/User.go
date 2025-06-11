@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/garciamendes/notes/src/models"
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -21,24 +24,12 @@ func (h *Handler) User() *UserHandler {
 	return &UserHandler{DB: h.DB}
 }
 
-type UserDTO struct {
-	Name     *string `json:"name"`
-	Email    string  `json:"email" validate:"email,required"`
-	Password string  `json:"password" validate:"required"`
-}
-
-type UserResponse struct {
-	ID    uuid.UUID
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
 func (userHandler UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var userDTO UserDTO
 
 	if err := json.NewDecoder(r.Body).Decode(&userDTO); err != nil {
-		http.Error(w, "JSON Inválido", http.StatusBadRequest)
+		http.Error(w, "System Error", http.StatusBadRequest)
 		return
 	}
 
@@ -87,9 +78,59 @@ func (userHandler UserHandler) Register(w http.ResponseWriter, r *http.Request) 
 		Name:  name,
 		Email: newUser.Email,
 	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(userResponse)
+}
+
+func (userHandler UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	var loginDto LoginDTO
+	if err := json.NewDecoder(r.Body).Decode(&loginDto); err != nil {
+		http.Error(w, "Invalid credentials", http.StatusBadRequest)
+		return
+	}
+
+	validate := validator.New()
+	err := validate.Struct(loginDto)
+
+	if err != nil {
+		var errors []string
+		for _, err := range err.(validator.ValidationErrors) {
+			errors = append(errors, err.Field()+": "+err.Tag())
+		}
+		http.Error(w, strings.Join(errors, ", "), http.StatusBadRequest)
+		return
+	}
+
+	var user models.User
+	if result := userHandler.DB.Select("id", "password").First(&user, "email = ?", loginDto.Email); result.Error != nil {
+		http.Error(w, "Invalid credentials", http.StatusBadRequest)
+		return
+	}
+
+	err = comparePassword(user.Password, loginDto.Password)
+	if err != nil {
+		http.Error(w, "Invalid credentials", http.StatusBadRequest)
+		return
+	}
+
+	token, err := tokenGeneration(user.ID)
+	fmt.Println(token, err)
+	if err != nil {
+		http.Error(w, "Invalid credentials", http.StatusBadRequest)
+		return
+	}
+
+	response := LoginResponse{
+		Token: token,
+	}
+
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(userResponse)
+	json.NewEncoder(w).Encode(response)
 }
 
 func hashPassword(password string) (string, error) {
@@ -100,4 +141,20 @@ func hashPassword(password string) (string, error) {
 	}
 
 	return string(passwordHashed), nil
+}
+
+func comparePassword(passwordHashed, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(passwordHashed), []byte(password))
+}
+
+func tokenGeneration(userID uuid.UUID) (string, error) {
+	claims := jwt.MapClaims{
+		"user": userID,
+		"exp":  time.Now().Add(time.Hour * 48).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(os.Getenv("TOKEN_SECRET_KEY")))
+
+	return tokenString, err
 }
