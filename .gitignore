@@ -18,6 +18,6 @@ pkg/
 # Dependency management
 go.sum
 
-.env*
+.env
 
 tmp
