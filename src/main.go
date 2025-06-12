@@ -6,6 +6,7 @@ import (
 
 	"github.com/garciamendes/notes/src/db"
 	"github.com/garciamendes/notes/src/handlers"
+	"github.com/garciamendes/notes/src/routes"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -25,10 +26,10 @@ func main() {
 
 	handlers := handlers.New(DB)
 	router := mux.NewRouter()
+	api := router.PathPrefix("/api").Subrouter()
 
-	// User
-	router.HandleFunc("/user", handlers.User().Register).Methods(http.MethodPost)
-	router.HandleFunc("/user/login", handlers.User().Login).Methods(http.MethodPost)
+	userRoutes := api.PathPrefix("/user").Subrouter()
+	routes.UserRoutes(userRoutes, handlers)
 
 	http.ListenAndServe(":8080", router)
 }

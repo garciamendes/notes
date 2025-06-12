@@ -11,7 +11,7 @@ type User struct {
 	Email    string    `gorm:"unique" json:"email" validate:"required,email"`
 	Password string    `json:"password" validate:"required"`
 
-	Notes []Note `gorm:"foreignKey:UserID"`
+	Notes []Note `gorm:"foreignKey:UserID" json:"notes"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

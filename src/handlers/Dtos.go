@@ -1,6 +1,8 @@
 package handlers
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type UserDTO struct {
 	Name     *string `json:"name"`
@@ -8,7 +10,7 @@ type UserDTO struct {
 	Password string  `json:"password" validate:"required"`
 }
 
-type UserResponse struct {
+type User struct {
 	ID    uuid.UUID
 	Name  string `json:"name"`
 	Email string `json:"email"`
