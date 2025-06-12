@@ -9,6 +9,7 @@ import (
 	"github.com/garciamendes/notes/src/routes"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -31,5 +32,12 @@ func main() {
 	userRoutes := api.PathPrefix("/user").Subrouter()
 	routes.UserRoutes(userRoutes, handlers)
 
-	http.ListenAndServe(":8080", router)
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	})
+
+	http.ListenAndServe(":8080", corsHandler.Handler(router))
 }
