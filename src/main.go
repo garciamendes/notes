@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/garciamendes/notes/src/db"
 	"github.com/garciamendes/notes/src/handlers"
@@ -32,8 +34,9 @@ func main() {
 	userRoutes := api.PathPrefix("/user").Subrouter()
 	routes.UserRoutes(userRoutes, handlers)
 
+	allowHost := os.Getenv("ALLOW_HOST")
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   strings.Split(allowHost, ","),
 		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
