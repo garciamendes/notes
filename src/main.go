@@ -34,6 +34,9 @@ func main() {
 	userRoutes := api.PathPrefix("/user").Subrouter()
 	routes.UserRoutes(userRoutes, handlers)
 
+	noteRoutes := api.PathPrefix("/notes").Subrouter()
+	routes.NoteRoutes(noteRoutes, handlers)
+
 	allowHost := os.Getenv("ALLOW_HOST")
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   strings.Split(allowHost, ","),

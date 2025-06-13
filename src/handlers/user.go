@@ -17,11 +17,11 @@ type UserHandler struct {
 	DB *gorm.DB
 }
 
-func (h *Handler) User() *UserHandler {
-	return &UserHandler{DB: h.DB}
+func (h *Handler) User() *NoteHandler {
+	return &NoteHandler{DB: h.DB}
 }
 
-func (userHandler UserHandler) Register(w http.ResponseWriter, r *http.Request) {
+func (userHandler NoteHandler) Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var userDTO UserDTO
 
@@ -71,7 +71,7 @@ func (userHandler UserHandler) Register(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(nil)
 }
 
-func (userHandler UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+func (userHandler NoteHandler) Login(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var loginDto LoginDTO
@@ -119,7 +119,7 @@ func (userHandler UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func (UserHandler UserHandler) Me(w http.ResponseWriter, r *http.Request) {
+func (UserHandler NoteHandler) Me(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value(middlewares.UserIDKey).(string)
 
 	if !ok {
