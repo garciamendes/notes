@@ -7,6 +7,7 @@ import (
 
 	"github.com/garciamendes/notes/src/middlewares"
 	"github.com/garciamendes/notes/src/models"
+	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
@@ -33,7 +34,7 @@ func (noteHandler NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 	search := r.URL.Query().Get("search")
 	if search != "" {
 		searchTerm := "%" + search + "%"
-		db.Where("title ILIKE ?", searchTerm)
+		db = db.Where("title ILIKE ?", searchTerm)
 	}
 
 	page := 1
@@ -63,4 +64,19 @@ func (noteHandler NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
+}
+
+func (noteHandler NoteHandler) Get(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	noteID := vars["id"]
+
+	var note NotesDetail
+	if err := noteHandler.DB.Model(&models.Note{}).Where("id = ?", noteID).First(&note).Error; err != nil {
+		http.Error(w, "Note not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(note)
 }

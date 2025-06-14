@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -12,6 +14,9 @@ type Note struct {
 
 	UserID uuid.UUID
 	User   User
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (n *Note) BeforeCreate(tx *gorm.DB) (err error) {

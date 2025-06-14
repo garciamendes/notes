@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
@@ -26,14 +28,18 @@ type LoginResponse struct {
 }
 
 type NotesDetail struct {
-	ID      uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
-	Title   string    `json:"name" validate:"required"`
-	Content string    `json:"content" validate:"required"`
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Title     string    `json:"title" validate:"required"`
+	Content   string    `json:"content" validate:"required"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Notes struct {
-	ID    uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
-	Title string    `json:"name" validate:"required"`
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Title     string    `json:"title" validate:"required"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type PaginationNotes struct {

@@ -13,4 +13,5 @@ func NoteRoutes(r *mux.Router, h *handlers.Handler) {
 	protected.Use(middlewares.VerifyToken)
 
 	protected.HandleFunc("", h.Note().List).Methods(http.MethodGet)
+	protected.HandleFunc("/{id}", h.Note().Get).Methods(http.MethodGet)
 }

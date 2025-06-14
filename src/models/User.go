@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -12,6 +14,9 @@ type User struct {
 	Password string    `json:"password" validate:"required"`
 
 	Notes []Note `gorm:"foreignKey:UserID" json:"notes"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
